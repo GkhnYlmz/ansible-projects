@@ -3,7 +3,7 @@
   hosts: all
   tasks:   
     - shell: rpm -q "{{ package_name }}"
-      ignore_errors: yes
+      ignore_errors: True
       register : result
     
     - command: echo "The package is existing on the system"
