@@ -6,9 +6,9 @@
       ignore_errors: yes
       register : result
     
-    - command: echo The package is existing on the system
-      when: result.stdout | length > 0
+    - command: echo "The package is existing on the system"
+      when: result is succeeded
       
-    - command: echo The package is not existing on the system
-      when: result is fail
+    - command: echo "The package is not existing on the system"
+      when: result is failed
        
