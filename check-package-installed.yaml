@@ -1,8 +1,13 @@
 ---
-- name: Hello World!
+- name: check package is installed
   hosts: all
- 
-  tasks:
- 
-  - name: Hello World!
-    shell: echo "Hi! Tower is working."
+  tasks:   
+    - shell: rpm -q "{{ package_name }}"
+      register : result
+    
+    - command: echo The package is existing on the system
+      when: result.stdout | length > 0
+      
+    - command: echo The package is not existing on the system
+      when: result.stdout | length <= 0
+       
