@@ -1,14 +1,8 @@
 ---
-- name: "check if a package is installed"
-  package_facts:
-    manager:"auto"
-
-- name: "test result"
-  debug:
-    msg: "NGINX found"
-  when: "'nginx' in ansible_facts.packages"
-
-- name: "test result"
-  debug:
-    msg: "NGINX not found"
-  when: "'nginx' not in ansible_facts.packages"
+- name: Hello World!
+  hosts: all
+ 
+  tasks:
+ 
+  - name: Hello World!
+    shell: echo "Hi! Tower is working."
