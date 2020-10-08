@@ -1,0 +1,30 @@
+---
+
+- name: Create a VM from a template
+  hosts: 192.168.3.151 
+  connection: ssh
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3.6"
+  tasks:
+  - name: Clone the template
+    vmware_guest:
+      hostname: 192.168.1.3
+      username: {{ username  }} #VMware credential
+      password: {{ password }} #VMware credential
+      name: "{{ vmname }}"
+      validate_certs: False
+      template: rhel7_template:
+      datacenter: KonsaltDC
+      folder: /
+      state: poweredon
+      wait_for_ip_address: no
+      wait_for_customization: yes
+      networks:
+      - name: VM Network
+        type: dhcp       
+        start_connected: yes
+      customization:
+        hostname: " {{ hostname }} "
+
+
