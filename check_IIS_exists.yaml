@@ -1,0 +1,5 @@
+---
+- name: Check if a service is installed
+  win_service:
+    name: "{{ package_name }}"
+  register: service_info
