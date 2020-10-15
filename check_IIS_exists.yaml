@@ -1,5 +1,7 @@
 ---
-- name: Check if a service is installed on windows machine
-  win_service:
-    name: "{{ package_name }}"
-  register: service_info
+- name: Check if a service is installed
+  hosts: all
+  tasks:
+  - win_service:
+     name: "{{ package_name }}"
+  - register: service_info
