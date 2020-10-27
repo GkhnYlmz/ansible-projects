@@ -1,0 +1,13 @@
+---
+
+- name: Check if a service is installed
+  hosts: all
+  tasks:
+  - name: Clone the template
+    win_service:
+      name: "{{ package_name }}"
+    register: " {{ service_info }} "
+    
+  - name: Debug
+    debug:
+      var: "{{ service_info }}"

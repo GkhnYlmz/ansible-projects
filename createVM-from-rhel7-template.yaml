@@ -1,0 +1,30 @@
+---
+
+- name: Create a VM from a template
+  hosts: localhost #Host from where this playbook run
+  connection: ssh
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3.6" #vmware guest only works with python3
+  tasks:
+  - name: Clone the template
+    vmware_guest:
+      hostname: 192.168.1.3 #VMWare host virtual  machine IP
+      username: "{{ username  }}" #VMware credential
+      password: "{{ password }}" #VMware credential
+      name: "{{ vmname }}" 
+      validate_certs: False
+      template: 'FFS-rhel78basartemplate' #where template resides,no need to write relative path. just tell the name of the template
+      datacenter: KonsaltDC 
+      folder: /  #under which folder new VM will be created
+      state: poweredon #should new VM be started after the creation
+      wait_for_ip_address: no
+      wait_for_customization: yes
+      networks:
+      - name: VM Network
+        type: dhcp       
+        start_connected: yes
+      customization:
+        hostname: "{{ hostname }}"
+
+

@@ -1,0 +1,15 @@
+--- 
+- 
+  gather_facts: false
+  hosts: windows  
+  # connection: winrm
+  name: "Checks a user is created, and if it is not it will create the following user"
+  tasks: 
+    - 
+      win_domain_user: 
+        firstname: denemefirstname
+        name: deneme
+        password: Qq123456
+        state: present
+        surname: denemesurname
+      name: "Checks a user is created, and if it is not it will create the following user"
