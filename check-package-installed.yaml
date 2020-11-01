@@ -11,4 +11,7 @@
       
     - command: echo "The package is not existing on the system"
       when: result is failed
-       
+    
+    - name: Display the package name
+      debug:
+        msg: "{{ package_name }} is installed? We are checking"
