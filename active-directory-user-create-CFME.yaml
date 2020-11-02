@@ -1,5 +1,5 @@
 ---
-- hosts: windows 
+- hosts: all 
   gather_facts: false
   name: "Checks a user is created, and if it is not it will create the following user"
   tasks:
