@@ -2,6 +2,15 @@
 - hosts: all 
   gather_facts: false
   name: "Checks a user is created, and if it is not it will create the following user"
+  vars:
+    ansible_connection: winrm
+    ansible_python_interpreter: '/usr/bin/python3.6'
+    ansible_password: "{{ ansible_password }}"
+    ansible_port: 5985
+    ansible_user: "{{ ansible_username }}"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_winrm_transport: credssp
+
   tasks:
     -
       name: "Checks a user is created, and if it is not it will create the following user"
@@ -11,11 +20,4 @@
         password: "{{ active_directory_user_password }}"
         state: present
         surname: "{{ active_directory_user_surname }}"
-  vars:
-    ansible_connection: '/usr/lib/python3.6/site-packages/ansible/winrm'
-    ansible_python_interpreter: '/usr/bin/python3.6'
-    ansible_password: "{{ ansible_password }}"
-    ansible_port: 5985
-    ansible_user: "{{ ansible_username }}"
-    ansible_winrm_server_cert_validation: ignore
-    ansible_winrm_transport: credssp
+
