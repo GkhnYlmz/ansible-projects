@@ -21,11 +21,8 @@
         state: present
         surname: "{{ active_directory_user_surname }}"
 
-    - name: "Run a command under a non-Powershell interpreter (cmd in this case)"
-      # ansible.windows.win_shell: 'echo %HOMEDIR%'
-      win_shell: 'echo %HOMEDIR%'
-      args:
-        executable: cmd
+    - name: "Run a command under Powershell interpreter"
+      win_shell:  New-Mailbox -Name "{{ active_directory_user_name }}"  "{{ active_directory_user_surname }}"  -UserPrincipalName "{{ active_directory_user_mail }}" -Password "{{ active_directory_user_password }}" -Database "{{ mailbox_database }}" -FirstName "{{ active_directory_user_name }}" -LastName "{{ active_directory_user_surname }}" -OrganizationalUnit Users 
       register: homedir_out
 
     - debug:
