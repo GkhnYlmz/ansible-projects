@@ -1,15 +1,20 @@
---- 
-- 
+---
+- hosts: "{{ host_name }}" 
   gather_facts: false
-  hosts: windows  
-  # connection: winrm
   name: "Checks a user is created, and if it is not it will create the following user"
-  tasks: 
-    - 
-      win_domain_user: 
-        firstname: denemefirstname
-        name: deneme
-        password: Qq123456
-        state: present
-        surname: denemesurname
+  tasks:
+    -
       name: "Checks a user is created, and if it is not it will create the following user"
+      win_domain_user:
+        firstname: "{{ active_directory_user_firstname }}"
+        name: "{{ active_directory_user_name }}"
+        password: "{{ active_directory_user_password }}"
+        state: present
+        surname: "{{ active_directory_user_surname }}"
+  vars:
+    ansible_connection: winrm
+    ansible_password: "{{ ansible_password }}"
+    ansible_port: 5985
+    ansible_user: "{{ ansible_username }}"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_winrm_transport: credssp
