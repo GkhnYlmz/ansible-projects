@@ -21,10 +21,3 @@
         state: present
         surname: "{{ active_directory_user_surname }}"
 
-    - name: "Run a command under Powershell interpreter"
-      win_shell:  New-Mailbox -Name "{{ active_directory_user_name }}"  "{{ active_directory_user_surname }}"  -UserPrincipalName "{{ active_directory_user_mail }}" -Password "{{ active_directory_user_password }}" -Database "{{ mailbox_database }}" -FirstName "{{ active_directory_user_name }}" -LastName "{{ active_directory_user_surname }}" -OrganizationalUnit Users 
-      register: homedir_out
-
-    - debug:
-        var: homedir_out
-
