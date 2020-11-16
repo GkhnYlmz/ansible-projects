@@ -1,0 +1,29 @@
+---
+- hosts: all 
+  gather_facts: false
+  name: "Checks a user is created, and if it is not it will create the following user"
+  vars:
+    ansible_connection: winrm
+    ansible_python_interpreter: '/usr/bin/python3.6'
+    ansible_password: "{{ ansible_password }}"
+    ansible_port: 5985
+    ansible_user: "{{ ansible_username }}"
+    ansible_winrm_server_cert_validation: ignore
+    ansible_winrm_transport: credssp
+
+  tasks:
+    - name: "Checks a user is created, and if it is not it will create the following user"
+      win_domain_user:
+        firstname: "{{ active_directory_user_firstname }}"
+        name: "{{ active_directory_user_name }}"
+        password: "{{ active_directory_user_password }}"
+        mail:  "{{ active_directory_user_mail }}"
+        state: present
+        surname: "{{ active_directory_user_surname }}"
+
+    - name: "Run a command under Powershell interpreter"
+      win_shell:  New-Mailbox -Name "{{ active_directory_user_name }}"  "{{ active_directory_user_surname }}"  -UserPrincipalName "{{ active_directory_user_mail }}" -Password "{{ active_directory_user_password }}" -Database "{{ mailbox_database }}" -FirstName "{{ active_directory_user_name }}" -LastName "{{ active_directory_user_surname }}" -OrganizationalUnit Users 
+      register: homedir_out
+
+    - debug:
+        var: homedir_out
