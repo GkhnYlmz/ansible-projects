@@ -10,7 +10,6 @@
     ansible_user: "{{ ansible_username }}"
     ansible_winrm_server_cert_validation: ignore
     ansible_winrm_transport: credssp
-    ansible_winrm_credssp_disable_tlsv1_2: true
 
   tasks:
     - name: "Checks a user is created, and if it is not it will create the following user"
