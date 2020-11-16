@@ -17,7 +17,6 @@
         firstname: "{{ active_directory_user_firstname }}"
         name: "{{ active_directory_user_name }}"
         password: "{{ active_directory_user_password }}"
-        mail:  "{{ active_directory_user_mail }}"
         state: present
         surname: "{{ active_directory_user_surname }}"
 
