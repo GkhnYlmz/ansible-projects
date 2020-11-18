@@ -14,7 +14,7 @@
       password: "{{ password }}" #VMware credential
       name: "{{ vmname }}" 
       validate_certs: False
-      template: 'FFS-rhel78basartemplate' #where template resides,no need to write relative path. just tell the name of the template
+      template: "{{ template_name  }} "  #where template resides,no need to write relative path. just tell the name of the template
       datacenter: KonsaltDC 
       folder: /  #under which folder new VM will be created
       state: poweredon #should new VM be started after the creation
