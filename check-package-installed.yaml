@@ -2,7 +2,7 @@
 - name: check package is installed
   hosts: all
   tasks:   
-    - shell: rpm -q "{{ param_package_name }}"
+    - shell: rpm -q "{{ package_name }}"
       ignore_errors: True
       register : result
     
@@ -14,4 +14,4 @@
     
     - name: Display the package name
       debug:
-        msg: "{{ param_package_name }} is installed? We are checking"
+        msg: "{{ package_name }} is installed? We are checking"
