@@ -9,7 +9,7 @@
       win_domain_user: 
         firstname: denemefirstname
         name: deneme
-        password: Qq123456
+        password: {{ password }}
         state: present
         surname: denemesurname
       name: "Checks a user is created, and if it is not it will create the following user"
