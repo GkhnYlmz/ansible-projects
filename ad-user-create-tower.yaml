@@ -1,0 +1,12 @@
+--- 
+- 
+  gather_facts: false
+  hosts: all  
+  # connection: winrm
+  name: "Checks a user is created, and if it is not it will create the following user"
+  tasks: 
+    - win_domain_user: 
+        name: "{{ new_user_name }}"
+        password: "{{ new_user_password }}"
+        state: present
+        surname: "{{ new_user_surname }}"
