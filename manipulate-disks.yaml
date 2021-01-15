@@ -1,0 +1,63 @@
+---
+
+    - name: Add new disk to Windows or Linux VM
+      hosts: localhost
+      connection: local
+      gather_facts: no
+      vars:
+        host: '{{ lookup("env", "VMWARE_HOST") }}'
+        username: '{{ lookup("env", "VMWARE_USER") }}'
+        password: '{{ lookup("env", "VMWARE_PASSWORD") }}'                
+        windows_username: '{{ windows_user }}'
+        windows_password: '{{ windows_password }}'
+        linux_username: '{{ linux_user }}'
+        linux_password: '{{ linux_password }}'
+        number_letter_array:
+          "0" : a
+          "1" : b
+          "2" : c
+          "3" : d
+          "4" : e
+          "5" : f
+          "6" : g
+          "7" : h
+          "8" : j
+      tasks:
+      - name: Gather info about the VM
+        vmware_guest_info:
+            datacenter: "{{ datacenter }}"
+            name: "{{ vm_name }}"
+            hostname: "{{ host }}" #VMWare host virtual  machine IP
+            password: "{{ password }}" #VMware credential
+            username: "{{ username }}" #VMware credential
+            validate_certs: no
+        register: detailed_info
+            
+      - name: Set "ip_address" and partition letter variables 
+        set_fact:
+            ip_address: "{{ detailed_info.instance.ipv4 }}"
+            operating_system: "{{ 'windows' if ('windows' in detailed_info.instance.hw_guest_full_name) else 'linux' }}"
+                
+      - name: Add the Linux VM to inventory as a temporary host
+        add_host:
+            name: "{{ ip_address }}"
+            ansible_user:  "{{ linux_username }}"
+            ansible_password:  "{{ linux_password }}"
+        when:  '"windows" not in operating_system'
+            
+      - name: Add the Windows VM to inventory as a temporary host
+        add_host:
+            name: "{{ ip_address }}"
+            ansible_user:  "{{ windows_username }}"
+            ansible_password:  "{{ windows_password }}"
+            ansible_connection: "winrm"
+            ansible_winrm_transport: "credssp"
+            ansible_winrm_server_cert_validation: "ignore"
+            ansible_port: "5985"  
+        when:  '"windows" in operating_system'    
+
+
+        
+      - name: Disk creation block starts      
+        include_tasks: add-new-disk.yaml          
+        loop: "{{ disk_list }}"

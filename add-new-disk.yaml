@@ -1,0 +1,109 @@
+---          
+          - name: Gather disk info from virtual machine using name
+            vmware_guest_disk_info:
+                hostname: "{{ host }}" #VMWare host virtual  machine IP
+                password: "{{ password }}" #VMware credential
+                username: "{{ username  }}" #VMware credential
+                datacenter: "{{ datacenter }}"
+                name: "{{ vm_name }}"
+            register: disk_info
+     
+          - name: Set "unit_number" variable 
+            set_fact:
+                unit_number: "{{ disk_info.guest_disk_info | length }}"                  
+                
+          - name: Set "drive_number" variable for Linux
+            set_fact:
+                drive_number : "{{ unit_number }}"
+            when:  '"windows" not in operating_system'
+
+          - name: Check all existing drives on Windows VM
+            win_shell: "gdr -PSProvider 'FileSystem'"
+            register: drives_on_windows
+            when: '"windows" in operating_system'
+            delegate_to: "{{ ip_address }}"       
+
+          - name: Set "drive_number" variable for Windows
+            set_fact:
+                drive_number : "{{ drives_on_windows.stdout | regex_findall('FileSystem') | length | int + 2 }}"            
+            when:  '"windows" in operating_system' 
+                
+          - name: Set "drive_letter" variable for Linux
+            set_fact:
+                drive_letter : "{{ number_letter_array[drive_number] }}" 
+            when:  '"windows" not in operating_system'
+            
+          - name: Set "drive_letter" variable for Windows
+            set_fact:
+                drive_letter : "{{ number_letter_array[drive_number] |upper }}"
+            when:  '"windows" in operating_system'            
+
+          - name: Add a new disk to a VM
+            vmware_guest_disk:
+                datacenter: "{{ datacenter }}"
+                disk:
+                - autoselect_datastore: no
+                  datastore: "{{ datastore }}"
+                  size_gb: "{{ item.size_gb }}"
+                  unit_number: "{{ unit_number }}"
+                  scsi_controller: "{{ disk_info.guest_disk_info|dict2items|json_query('[0].value.controller_bus_number') }}"
+                  scsi_type: "{{ disk_info.guest_disk_info|dict2items|json_query('[0].value.controller_type') }}"
+                folder: "{{ folder | default(omit) }}"
+                name: "{{ vm_name }}"
+                hostname: "{{ host }}" #VMWare host virtual  machine IP
+                password: "{{ password }}" #VMware credential
+                username: "{{ username  }}" #VMware credential
+                validate_certs: no
+                
+          - name: Create a path to mount the added disk # to given directory
+            file:
+                path: "{{ item.full_path_to_mount }}"
+                state: directory
+                mode: '0755'        
+            delegate_to: "{{ ip_address }}"
+            when:  '"windows" not in operating_system'
+
+          - name: Initialize Disk on Windows machine
+            win_shell: "Initialize-Disk -Number {{ unit_number }}"
+            when: '"windows" in operating_system'
+            delegate_to: "{{ ip_address }}"
+            
+          - name: Create Partition using all available space on Windows VM
+            win_partition:
+                drive_letter: "{{ drive_letter }}"
+                partition_size: -1
+                disk_number: "{{ unit_number }}"
+            when: '"windows" in operating_system'
+            delegate_to: "{{ ip_address }}"
+          
+          - name: Create a partition on Linux VM
+            parted:
+                device: "/dev/sd{{ drive_letter }}"
+                number: 1
+                state: present            
+                unit: GB
+            delegate_to: "{{ ip_address }}"
+            when:  '"windows" not in operating_system'
+            
+          - name: Format the partition as NTFS and label it on Windows VM
+            win_format:
+                drive_letter: "{{ drive_letter }}"
+                file_system: "{{ item.fs_type | default('NTFS') }}"
+                new_label: Data
+            when: '"windows" in operating_system'
+            delegate_to: "{{ ip_address }}"
+
+          - name: Create filesystem on the partition
+            command:
+                cmd: "mkfs -t {{ item.fs_type }} /dev/sd{{ drive_letter }}1  " 
+            delegate_to: "{{ ip_address }}"
+            when:  '"windows" not in operating_system'
+                
+          - name: Mount the device
+            mount:
+                path: "{{ item.full_path_to_mount }}"
+                src: "/dev/sd{{ drive_letter }}1"
+                state: mounted
+                fstype: "{{ item.fs_type | default('xfs') }}"
+            delegate_to: "{{ ip_address }}"
+            when:  '"windows" not in operating_system'
