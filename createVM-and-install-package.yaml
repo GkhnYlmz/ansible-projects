@@ -1,0 +1,102 @@
+---
+- name: Create a VM and install a new package
+  hosts: localhost
+  connection: local
+  tasks:   
+  - name: Create a VM on VCenter
+    vmware_guest:               
+        #Ansible
+        annotation: "{{ annotation }}"
+        #Ansible
+        cluster: "{{ cluster }}"
+        #Ansible
+        customization:
+           #Ansible
+           hostname: "{{ hostname }}"                  
+           #Ansible
+           orgname: Turktelekom
+        #Ansible   
+        datacenter: "{{ datacenter }}" 
+        #Ansible
+        disk:
+          #Ansible
+        - type: thin
+          #Ansible
+          size_gb: "{{ disk_size }}"
+          #Ansible 
+          datastore: "{{ datastore }}"
+        #Ansible
+        folder: "{{ folder | default('/') }}" #musteri adi verilebilir           
+        #Ansible
+        hostname: "{{ vcenter_hostname }}" #VCenter name
+        hardware:
+          #Ansible
+          hotadd_cpu: no
+          #Ansible
+          hotadd_memory: no
+          #Ansible
+          hotremove_cpu: no
+          #Ansible
+          memory_mb : "{{ memory_in_gb | int * 1024 }}"
+          #Ansible
+          num_cpu_cores_per_socket: "{{ num_cpu_cores_per_socket | default(1) }}"
+          #Ansible
+          num_cpus: "{{ num_cpus }}"                  
+        #Ansible
+        name: "{{ vm_name }}"                  
+        #Ansible
+        password: "{{ vcenter_password }}" #VMware credential                  
+        #Ansible
+        state: poweredon                    
+        #Ansible
+        template: "{{ template_name }}"                   
+        #Ansible
+        username: "{{ vcenter_username }}" #VMware credential                   
+        #Ansible
+        validate_certs: no                   
+        #Ansible
+        wait_for_customization: yes                  
+        #Ansible
+        wait_for_ip_address: yes                  
+    register: output  
+
+  - name: Gather info about the VCenter VM
+    vmware_guest_info:
+        #CRM
+        datacenter: "{{ datacenter }}" #DC Added automatically but will be changed
+        #CRM
+        name: "{{ vm_name }}"
+        #Ansible
+        hostname: "{{ vcenter_hostname }}" #VMWare host virtual  machine IP
+        #Ansible
+        password: "{{ vcenter_password }}" #VMware credential
+        #Ansible
+        username: "{{ vcenter_username }}" #VMware credential
+        #Ansible
+        validate_certs: no
+    until: detailed_info.instance.ipv4 | default('', true) | trim != '' and detailed_info.unreachable is not defined and detailed_info is not failed
+    retries: 15
+    delay: 60
+    register: detailed_info
+
+  - name: Set the "ip_address" and operating system variables 
+    set_fact:
+        ip_address: "{{ detailed_info.instance.ipv4 }}"      
+
+  - name: Add the Linux VM to inventory as a temporary host
+    add_host:          
+     #Ansible
+     name: "{{ ip_address }}"
+     #Ansible
+     ansible_user:  "{{ username }}"
+     #Ansible
+     ansible_password:  "{{ password }}"
+     #Ansible
+     ansible_ssh_port: "{{ ssh_port }}"
+    
+  - name: Install the latest version of Apache
+    yum:
+      name: httpd
+      state: latest
+    delegate_to: "{{ ip_address }}"
+  
