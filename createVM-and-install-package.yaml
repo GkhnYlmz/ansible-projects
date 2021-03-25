@@ -56,9 +56,7 @@
         #Ansible
         username: "{{ vcenter_username }}" #VMware credential                   
         #Ansible
-        validate_certs: no                   
-        #Ansible
-        wait_for_customization: yes                  
+        validate_certs: no                                   
         #Ansible
         wait_for_ip_address: yes                  
     register: output  
