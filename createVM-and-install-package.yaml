@@ -100,9 +100,6 @@
   - name: Install the latest version of Apache
     vars:
       ansible_python_interpreter: /usr/bin/python2
-    yum:
-      name: httpd
-      state: latest
-      use_backend: yum
+    shell: yum install httpd -y
     delegate_to: "{{ ip_address }}"
   
