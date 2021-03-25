@@ -96,10 +96,14 @@
      ansible_ssh_port: "{{ ssh_port }}"
      #Ansible
      ansible_python_interpreter: /usr/bin/python2
-    
+
+- name: Create a VM and install a new package
+  hosts: "{{ ip_address }}"
+  connection: ssh
+  gather_facts: no
+  tasks:  
   - name: Install the latest version of Apache
     vars:
       ansible_python_interpreter: /usr/bin/python2
     shell: yum install httpd -y
-    delegate_to: "{{ ip_address }}"
   
