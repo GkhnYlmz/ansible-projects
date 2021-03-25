@@ -94,6 +94,8 @@
      ansible_password:  "{{ password }}"
      #Ansible
      ansible_ssh_port: "{{ ssh_port }}"
+     #Ansible
+     ansible_python_interpreter: /usr/bin/python2
     
   - name: Install the latest version of Apache
     vars:
