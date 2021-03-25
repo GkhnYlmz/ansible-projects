@@ -13,11 +13,11 @@
         #Ansible
         cluster: "{{ cluster }}"
         #Ansible
-        customization:
+        #customization:
            #Ansible
-           hostname: "{{ hostname }}"                  
+           #hostname: "{{ hostname }}"                  
            #Ansible
-           orgname: Turktelekom
+           #orgname: Turktelekom
         #Ansible   
         datacenter: "{{ datacenter }}" 
         #Ansible
