@@ -96,6 +96,11 @@
      ansible_ssh_port: "{{ ssh_port }}"
     
   - name: Install the latest version of Apache
+    vars:
+      ansible_become_method: su      
+      ansible_become_password: "{{ password }}"
+      ansible_become: yes      
+      ansible_become_user: root
     yum:
       name: httpd
       state: latest
