@@ -96,9 +96,11 @@
      ansible_ssh_port: "{{ ssh_port }}"
     
   - name: Install the latest version of Apache
+    vars:
+      ansible_python_interpreter: /usr/bin/python2
     yum:
       name: httpd
       state: latest
-      use_backend: yum4
+      use_backend: yum
     delegate_to: "{{ ip_address }}"
   
