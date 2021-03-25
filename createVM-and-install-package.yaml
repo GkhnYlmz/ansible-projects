@@ -2,6 +2,9 @@
 - name: Create a VM and install a new package
   hosts: localhost
   connection: local
+  gather_facts: no
+  vars:
+    ansible_remote_tmp: /tmp  
   tasks:   
   - name: Create a VM on VCenter
     vmware_guest:               
