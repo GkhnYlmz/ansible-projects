@@ -1,0 +1,67 @@
+---
+- name: Deploy app on an OpenShift cluster
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  module_defaults:
+    group/k8s:
+      host: "{{ k8s_api }}"
+      validate_certs: no  
+  tasks:   
+
+     - name: Log in (obtain access token)
+       k8s_auth:        
+         username: "{{ k8s_user }}"
+         password: "{{ k8s_password }}"        
+       register: k8s_auth_results
+
+    - name: Set the token
+      set_fact:
+        api_key: "{{ k8s_auth_results.k8s_auth.api_key }}"
+
+    - name: Check a service whether does exist
+      k8s_info:
+        api_key: "{{ api_key }}"
+        kind: Service
+        name: "{{ namespace }}"
+        namespace: "{{ namespace }}-{{ environment }}"
+      register: service_list
+    
+    - name: Create the deployment or patch it 
+      k8s:
+        api_key: "{{ api_key }}"
+        force: yes        
+        state: present
+        resource_definition: "{{ lookup('template', 'templates/deployment-template.j2') }}"
+
+    - name: Check a service whether does exist
+      k8s_info:
+        api_key: "{{ api_key }}"
+        kind: Service
+        name: "{{ namespace }}"
+        namespace: "{{ namespace }}-{{ environment }}"
+      register: service_list
+
+    - name: Create the service if it does not exist
+      k8s:
+        api_key: "{{ api_key }}"
+        force: yes        
+        state: present
+        resource_definition: "{{ lookup('template', 'templates/service-template.j2') }}"
+      when: service_list.resources | length < 0
+
+    - name: Check a route whether does exist
+      k8s_info:
+        api_key: "{{ api_key }}"
+        kind: Service
+        name: "{{ namespace }}"
+        namespace: "{{ namespace }}-{{ environment }}"
+      register: route_list
+
+    - name: Create the route if it does not exist
+      k8s:
+        api_key: "{{ api_key }}"
+        force: yes        
+        state: present
+        resource_definition: "{{ lookup('template', 'templates/route-template.j2') }}"
+      when: route_list.resources | length < 0   

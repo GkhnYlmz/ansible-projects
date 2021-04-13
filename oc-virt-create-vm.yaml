@@ -1,0 +1,12 @@
+---
+- name: Create a VM and install a new package
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    ansible_remote_tmp: /tmp  
+  tasks:   
+    - name: Create VM in OpenShift Cluster
+      kubevirt_vm:
+        #api_key:    #Token used to authenticate with the API. Can also be specified via K8S_AUTH_API_KEY environment variable.
+        
