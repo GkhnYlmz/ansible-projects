@@ -45,7 +45,7 @@
     - name: Check a route whether exists
       k8s_info:
         api_key: "{{ api_key }}"
-        kind: Service
+        kind: Route
         name: "{{ app_name }}-route"
         namespace: "{{ namespace }}-{{ env }}"
       register: route_list
