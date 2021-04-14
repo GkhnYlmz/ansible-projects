@@ -7,25 +7,17 @@
     group/k8s:
       host: "{{ k8s_api }}"
       validate_certs: no  
-  tasks:   
-
-     - name: Log in (obtain access token)
-       k8s_auth:        
-         username: "{{ k8s_user }}"
-         password: "{{ k8s_password }}"        
-       register: k8s_auth_results
+  tasks:
+      
+    - name: Log in (obtain access token)
+      k8s_auth:        
+        username: "{{ k8s_user }}"
+        password: "{{ k8s_password }}"        
+      register: k8s_auth_results
 
     - name: Set the token
       set_fact:
         api_key: "{{ k8s_auth_results.k8s_auth.api_key }}"
-
-    - name: Check a service whether does exist
-      k8s_info:
-        api_key: "{{ api_key }}"
-        kind: Service
-        name: "{{ namespace }}"
-        namespace: "{{ namespace }}-{{ environment }}"
-      register: service_list
     
     - name: Create the deployment or patch it 
       k8s:
@@ -34,12 +26,12 @@
         state: present
         resource_definition: "{{ lookup('template', 'templates/deployment-template.j2') }}"
 
-    - name: Check a service whether does exist
+    - name: Check a service whether exists
       k8s_info:
         api_key: "{{ api_key }}"
         kind: Service
-        name: "{{ namespace }}"
-        namespace: "{{ namespace }}-{{ environment }}"
+        name: "{{ app_name }}-service"
+        namespace: "{{ namespace }}-{{ env }}"
       register: service_list
 
     - name: Create the service if it does not exist
@@ -48,14 +40,14 @@
         force: yes        
         state: present
         resource_definition: "{{ lookup('template', 'templates/service-template.j2') }}"
-      when: service_list.resources | length < 0
+      when: service_list.resources | length < 1
 
-    - name: Check a route whether does exist
+    - name: Check a route whether exists
       k8s_info:
         api_key: "{{ api_key }}"
         kind: Service
-        name: "{{ namespace }}"
-        namespace: "{{ namespace }}-{{ environment }}"
+        name: "{{ app_name }}-route"
+        namespace: "{{ namespace }}-{{ env }}"
       register: route_list
 
     - name: Create the route if it does not exist
@@ -64,4 +56,4 @@
         force: yes        
         state: present
         resource_definition: "{{ lookup('template', 'templates/route-template.j2') }}"
-      when: route_list.resources | length < 0   
+      when: route_list.resources | length < 1   

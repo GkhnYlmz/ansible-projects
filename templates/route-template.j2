@@ -3,14 +3,14 @@ apiVersion: v1
 kind: Route
 metadata:
   name: "{{ app_name }}-route"
-  namespace: "{{ project_name }}"
+  namespace: "{{ namespace }}-{{ env }}"
   labels:
     app: "{{ app_name }}"
 spec:
   host: "{{ app_name }}.{{ k8s_apps }}" 
   to:
     kind: Service
-    name: "{{ app_name }}"
+    name: "{{ app_name }}-service"
   port:
     targetPort: 8080-tcp
   wildcardPolicy: None    

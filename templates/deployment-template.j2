@@ -3,11 +3,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "{{ app_name }}-deployment"
-  namespace: "{{ project_name }}"
+  namespace: "{{ namespace }}-{{ env }}"
   labels:
      app: "{{ app_name }}" 
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: "{{ app_name }}"
